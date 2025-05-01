@@ -1,3 +1,4 @@
+@import './styles.css'; /* Add this import statement to include global styles */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

@@ -1,67 +1,25 @@
-import React, { useState, useEffect } from "react";
-import Header from "./components/Header";
-import SearchBar from "./components/SearchBar";
-import TypeFilter from "./components/TypeFilter";
-import PokemonList from "./components/PokemonList";
-import "./App.css";
+import React from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import FavoritesPage from './pages/FavoritesPage';
+import DetailPage from './pages/DetailPage';
+import ComparePage from './pages/ComparePage';
 
 function App() {
-  const [pokemons, setPokemons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("All");
-
-  useEffect(() => {
-    const fetchPokemons = async () => {
-      try {
-        let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=150");
-        let data = await response.json();
-
-        let detailedPokemons = await Promise.all(
-          data.results.map(async (pokemon) => {
-            let res = await fetch(pokemon.url);
-            return res.json();
-          })
-        );
-
-        setPokemons(detailedPokemons);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch Pokémon");
-        setLoading(false);
-      }
-    };
-
-    fetchPokemons();
-  }, []);
-
-  const handleSearchChange = (e) => setSearchTerm(e.target.value.toLowerCase());
-  const handleTypeChange = (e) => setTypeFilter(e.target.value);
-
-  const filteredPokemons = pokemons.filter((pokemon) => {
-    const matchesSearch = pokemon.name.includes(searchTerm);
-    const matchesType =
-      typeFilter === "All" || pokemon.types.some((t) => t.type.name === typeFilter.toLowerCase());
-
-    return matchesSearch && matchesType;
-  });
-
   return (
-    <div className="App">
-      <Header />
-      <div className="controls">
-        <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-        <TypeFilter onTypeChange={handleTypeChange} />
-      </div>
-
-      {loading && <p>Loading Pokémon...</p>}
-      {error && <p>{error}</p>}
-
-      {!loading && filteredPokemons.length === 0 && <p>No Pokémon found!</p>}
-      
-      <PokemonList pokemons={filteredPokemons} />
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h1 style={{ textAlign: 'center' }}>Pokémon Explorer</h1>
+      <nav style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <Link to="/" style={{ margin: '0 15px' }}>Home</Link>
+        <Link to="/favorites" style={{ margin: '0 15px' }}>Favorites</Link>
+        <Link to="/compare" style={{ margin: '0 15px' }}>Compare</Link>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/pokemon/:name" element={<DetailPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
+        <Route path="/compare" element={<ComparePage />} />
+      </Routes>
     </div>
   );
 }
